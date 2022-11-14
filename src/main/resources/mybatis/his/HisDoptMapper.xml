@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.his.mapper.HisDeptMapper">
+
+    <resultMap type="hisDept" id="HisDeptResult">
+        <id property="deptId" column="dept_id"/>
+        <result property="deptName" column="dept_name"/>
+        <result property="deptCode" column="dept_code"/>
+        <result property="deptNum" column="dept_num"/>
+        <result property="deptLeader" column="dept_leader"/>
+        <result property="deptPhone" column="dept_phone"/>
+        <result property="status" column="status"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="selectDeptVo">
+        select dept_id, dept_name, dept_code, dept_num, dept_leader, dept_phone, status, create_by, create_time, update_by, update_time, remark
+        from doctor_dept
+    </sql>
+
+    <!--查询科室信息-->
+    <select id="selectDeptList" parameterType="HisDept" resultMap="HisDeptResult">
+        <include refid="selectDeptVo"/>
+        <where>
+            <if test="deptName != null and deptName != ''">
+                AND dept_name like concat('%', #{deptName}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectDeptById" parameterType="Long" resultMap="HisDeptResult">
+        <include refid="selectDeptVo"/>
+        where dept_id = #{deptId}
+    </select>
+
+    <!--新增科室信息-->
+    <insert id="insertDept">
+        insert into doctor_dept(
+        <if test="deptId != null">dept_id,</if>
+        <if test="deptName != null and deptName != ''">dept_name,</if>
+        <if test="deptCode != null and deptCode != ''">dept_code,</if>
+        <if test="deptNum != null">dept_num,</if>
+        <if test="deptLeader != null">dept_leader,</if>
+        <if test="deptPhone != null">dept_phone,</if>
+        <if test="status != null">status,</if>
+        <if test="createBy != null">create_by,</if>
+        <if test="remark != null and remark != ''">remark,</if>
+        create_time
+        )values (
+        <if test="deptId != null">#{deptId},</if>
+        <if test="deptName != null and deptName != ''">#{deptName},</if>
+        <if test="deptCode != null and deptCode != ''">#{deptCode},</if>
+        <if test="deptNum != null">#{deptNum},</if>
+        <if test="deptLeader != null">#{deptLeader},</if>
+        <if test="deptPhone != null">#{deptPhone},</if>
+        <if test="status != null">#{status},</if>
+        <if test="createBy != null">#{createBy},</if>
+        <if test="remark != null and remark != ''">#{remark},</if>
+        sysdate()
+        )
+    </insert>
+
+    <select id="checkDeptNameUnique" parameterType="String" resultMap="HisDeptResult">
+        <include refid="selectDeptVo"/>
+        where dept_name=#{deptName} limit 1
+    </select>
+
+    <select id="checkDeptCodeUnique" parameterType="String" resultMap="HisDeptResult">
+        <include refid="selectDeptVo"/>
+        where dept_code=#{deptCode} limit 1
+    </select>
+
+    <select id="selectDeptListByUserId" parameterType="Long" resultType="Integer">
+        select d.dept_id
+        from doctor_dept d
+                 left join sys_user_dept up on ud.dept_id = d.dept_id
+                 left join sys_user u on u.user_id = ud.user_id
+        where u.user_id = #{userId}
+    </select>
+
+    <update id="updateDept" parameterType="HisDept">
+        update doctor_dept
+        <set>
+            <if test="deptName != null and deptName != ''">dept_name = #{deptName},</if>
+            <if test="deptCode != null and deptCode != ''">dept_code = #{deptCode},</if>
+            <if test="deptLeader != null">dept_leader = #{deptLeader},</if>
+            <if test="deptPhone != null">dept_phone = #{deptPhone},</if>
+            <if test="deptNum != null">dept_num = #{deptNum},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </set>
+        where dept_id = #{deptId}
+    </update>
+
+
+    <delete id="deleteDeptById" parameterType="Long">
+        delete from doctor_dept where dept_id = #{deptId}
+    </delete>
+
+    <delete id="deleteDeptByIds" parameterType="Long">
+        delete from doctor_dept where dept_id in
+        <foreach collection="array" item="deptId" open="(" separator="," close=")">
+            #{deptId}
+        </foreach>
+    </delete>
+
+<!--    <insert id="insertDept" parameterType="HisDept" useGeneratedKeys="true" keyProperty="deptId">-->
+<!--        insert into doctor_dept(-->
+<!--        <if test="deptId != null and deptId != 0">dept_id,</if>-->
+<!--        <if test="deptName != null and deptName != ''">dept_name,</if>-->
+<!--        <if test="deptCode != null and deptCode != ''">dept_code,</if>-->
+<!--        <if test="deptNum != null and deptNum != ''">dept_num,</if>-->
+<!--        <if test="deptLeader != null and deptLeader != ''">dept_leader,</if>-->
+<!--        <if test="deptPhone != null and deptPhone != ''">dept_phone,</if>-->
+
+<!--        <if test="status != null and status != ''">status,</if>-->
+<!--        <if test="createBy != null and createBy != ''">create_by,</if>-->
+<!--        <if test="createTime != null and createTime != ''">create_time,</if>-->
+<!--        <if test="updateBy != null and updateBy != ''">update_by,</if>-->
+<!--        <if test="updateTime != null and updateTime != ''">update_time,</if>-->
+
+<!--        )values(-->
+<!--        <if test="deptId != null and deptId != 0">#{deptId},</if>-->
+<!--        <if test="deptName != null and deptName != ''">#{deptName},</if>-->
+<!--        <if test="deptCode != null and deptCode != ''">#{deptCode},</if>-->
+<!--        <if test="deptNum != null and deptNum != ''">#{deptNum},</if>-->
+<!--        <if test="deptLeader != null and deptLeader != ''">#{deptLeader},</if>-->
+<!--        <if test="deptPhone != null and deptPhone != ''">#{deptPhone},</if>-->
+
+<!--        <if test="status != null and status != ''">#{status},</if>-->
+<!--        <if test="createBy != null and createBy != ''">#{createBy},</if>-->
+<!--        <if test="createTime != null and createTime != ''">#{createTime},</if>-->
+<!--        <if test="updateBy != null and updateBy != ''">#{updateBy},</if>-->
+<!--        <if test="updateTime != null and updateTime != ''">#{updateTime},</if>-->
+<!--        )-->
+<!--    </insert>-->
+
+
+
+
+
+<!--    <select id="selectDeptsByUserName" parameterType="String" resultMap="HisDeptResult">-->
+<!--        select d.dept_id, d.dept_name, d.dept_code-->
+<!--        from doctor_dept d-->
+<!--                 left join sys_user_dept up on ud.dept_id = d.dept_id-->
+<!--                 left join sys_user u on u.user_id = ud.user_id-->
+<!--        where u.user_name = #{userName}-->
+<!--    </select>-->
+
+
+
+
+
+
+
+<!--    <delete id="deleteDeptById" parameterType="Long">-->
+<!--        delete-->
+<!--        from doctor_dept-->
+<!--        where dept_id = #{deptId}-->
+<!--    </delete>-->
+
+<!--    <delete id="deleteDeptByIds" parameterType="Long">-->
+<!--        delete from doctor_dept where dept_id in-->
+<!--        <foreach collection="array" item="deptId" open="(" separator="," close=")">-->
+<!--            #{deptId}-->
+<!--        </foreach>-->
+<!--    </delete>-->
+
+</mapper> 
