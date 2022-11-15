@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ruoyi.project.drug.mapper.DrugMapper">
+
+    <resultMap id="drugMap" type="Drug">
+        <id     column="durg_id"         property="durgId"/>
+        <result column="durg_name"       property="durgName" />
+        <result column="durg_code"       property="durgCode" />
+        <result column="durg_producer"   property="durgProducer" />
+        <result column="durg_type"       property="durgType" />
+        <result column="durg_otc_type"   property="durgOtcType" />
+        <result column="durg_unit"       property="durgUnit" />
+        <result column="durg_otc_price"  property="durgOtcPrice" />
+        <result column="durg_number"     property="durgNumber" />
+        <result column="durg_number_min" property="durgNumberMin" />
+        <result column="durg_convert"    property="durgConvert" />
+        <result column="durg_status"     property="durgStatus" />
+        <result property="createBy"      column="create_by"     />
+        <result property="createTime"    column="create_time"   />
+        <result property="updateBy"      column="update_by"     />
+        <result property="updateTime"    column="update_time"   />
+        <result property="remark"        column="remark"        />
+    </resultMap>
+
+    <resultMap id="drugProMap" type="Drug">
+        <id     column="durg_id"         property="durgId"/>
+        <result column="durg_name"       property="durgName" />
+        <result column="durg_code"       property="durgCode" />
+        <result column="durg_producer"   property="durgProducer" />
+        <result column="durg_type"       property="durgType" />
+        <result column="durg_otc_type"   property="durgOtcType" />
+        <result column="durg_unit"       property="durgUnit" />
+        <result column="durg_otc_price"  property="durgOtcPrice" />
+        <result column="durg_number"     property="durgNumber" />
+        <result column="durg_number_min" property="durgNumberMin" />
+        <result column="durg_convert"    property="durgConvert" />
+        <result column="durg_status"     property="durgStatus" />
+        <result property="createBy"      column="create_by"     />
+        <result property="createTime"    column="create_time"   />
+        <result property="updateBy"      column="update_by"     />
+        <result property="updateTime"    column="update_time"   />
+        <result property="remark"        column="remark"        />
+        <association property="producer" javaType="DrugProducer">
+            <id property="proId"             column="pro_id"/>
+            <result property="proName"       column="pro_name" />
+            <result property="proCode"       column="pro_code" />
+            <result property="proBoss"       column="pro_boss" />
+            <result property="proPhone"      column="pro_phone" />
+            <result property="proKeywords"   column="pro_keywords" />
+            <result property="proStatus"     column="pro_status" />
+            <result property="proAddress"    column="pro_address" />
+            <result property="createBy"      column="p_create_by"     />
+            <result property="createTime"    column="p_create_time"   />
+            <result property="updateBy"      column="p_update_by"     />
+            <result property="updateTime"    column="p_update_time"   />
+            <result property="remark"        column="p_remark"        />
+        </association>
+    </resultMap>
+
+    <sql id="selectDrugVo">
+        select durg.durg_id, durg.durg_name, durg.durg_code, durg.durg_producer, durg.durg_type, durg.durg_otc_type, durg.durg_unit, durg.durg_otc_price,
+               durg.durg_number, durg.durg_number_min, durg.durg_convert, durg.durg_status, durg.create_by, durg.create_time, durg.update_by, durg.update_time, durg.remark
+        from drugs_durg durg
+    </sql>
+
+    <select id="selectBySupportId" resultMap="drugProMap">
+        select durg.durg_id, durg.durg_name, durg.durg_code, durg.durg_producer, durg.durg_type,
+               durg.durg_otc_type, durg.durg_unit, durg.durg_otc_price,
+               durg_number, durg.durg_number_min, durg.durg_convert, durg.durg_status, durg.create_by,
+               durg.create_time, durg.update_by, durg.update_time, durg.remark,
+               pro.pro_id, pro.pro_name, pro.pro_code, pro.pro_boss, pro.pro_phone, pro.pro_keywords,
+               pro.pro_status, pro.pro_address,
+               pro.create_by as p_create_by, pro.create_time as p_create_time, pro.update_by as p_update_by,
+               pro.update_time as p_update_time, pro.remark p_remark
+        from drugs_durg durg
+             left join
+             drugs_producer pro
+             on durg.durg_producer = pro.pro_id
+             left join
+             drugs_pro_sup prosup
+             on durg.durg_producer = prosup.producer_id
+        where prosup.support_id = #{supportId}
+    </select>
+
+    <delete id="batchDelete">
+        delete from drugs_durg
+        where durg_id in
+        <foreach collection="drugIds" item="drugId" open="(" close=")" separator=",">
+            #{drugId}
+        </foreach>
+    </delete>
+
+    <update id="updateById">
+        update drugs_durg
+        <set>
+            <if test="durgName != null and durgName != ''">durg_name = #{durgName},</if>
+            <if test="durgCode != null and durgCode != ''">durg_code = #{durgCode},</if>
+            <if test="durgProducer != null and durgProducer != 0">durg_producer = #{durgProducer},</if>
+            <if test="durgType != null and durgType != ''">durg_type = #{durgType},</if>
+            <if test="durgOtcType != null and durgOtcType != ''">durg_otc_type = #{durgOtcType},</if>
+            <if test="durgUnit != null and durgUnit != ''">durg_unit = #{durgUnit},</if>
+            <if test="durgOtcPrice != null and durgOtcPrice != 0">durg_otc_price = #{durgOtcPrice},</if>
+            <if test="durgNumber != null and durgNumber != 0">durg_number = #{durgNumber},</if>
+            <if test="durgNumberMin != null and durgNumberMin != 0">durg_number_min = #{durgNumberMin},</if>
+            <if test="durgConvert != null and durgConvert != ''">durg_convert = #{durgConvert},</if>
+            <if test="durgStatus != null and durgStatus != ''">durg_status = #{durgStatus},</if>
+            <if test="remark != null and remark != ''">remark = #{remark},</if>
+            <if test="updateBy != null and updateBy !=''">update_by = #{updateBy}, </if>
+            update_time = sysdate()
+        </set>
+        where durg_id = #{durgId}
+    </update>
+
+    <select id="selectById" resultMap="drugMap">
+        <include refid="selectDrugVo"></include>
+        where durg_id = #{durgId}
+    </select>
+
+    <insert id="insertDrug" useGeneratedKeys="true" keyProperty="durgId">
+        insert into drugs_durg
+        (
+                <if test="durgId != null and durgId != 0">durg_id,</if>
+                <if test="durgName != null and durgName != ''">durg_name,</if>
+                <if test="durgCode != null and durgCode != ''">durg_code,</if>
+                <if test="durgProducer != null and durgProducer != 0">durg_producer,</if>
+                <if test="durgType != null and durgType != ''">durg_type,</if>
+                <if test="durgOtcType != null and durgOtcType != ''">durg_otc_type,</if>
+                <if test="durgUnit != null and durgUnit != ''">durg_unit,</if>
+                <if test="durgOtcPrice != null and durgOtcPrice != 0">durg_otc_price,</if>
+                <if test="durgNumber != null and durgNumber != 0">durg_number,</if>
+                <if test="durgNumberMin != null and durgNumberMin != 0">durg_number_min,</if>
+                <if test="durgConvert != null and durgConvert != ''">durg_convert,</if>
+                <if test="durgStatus != null and durgStatus != ''">durg_status,</if>
+                <if test="remark != null and remark != ''">remark,</if>
+                <if test="createBy != null and createBy !=''">create_by, </if>
+                create_time
+        )
+        values(
+                <if test="durgId != null and durgId != 0">#{durgId},</if>
+                <if test="durgName != null and durgName != ''">#{durgName},</if>
+                <if test="durgCode != null and durgCode != ''">#{durgCode},</if>
+                <if test="durgProducer != null and durgProducer != 0">#{durgProducer},</if>
+                <if test="durgType != null and durgType != ''">#{durgType},</if>
+                <if test="durgOtcType != null and durgOtcType != ''">#{durgOtcType},</if>
+                <if test="durgUnit != null and durgUnit != ''">#{durgUnit},</if>
+                <if test="durgOtcPrice != null and durgOtcPrice != 0">#{durgOtcPrice},</if>
+                <if test="durgNumber != null and durgNumber != 0">#{durgNumber},</if>
+                <if test="durgNumberMin != null and durgNumberMin != 0">#{durgNumberMin},</if>
+                <if test="durgConvert != null and durgConvert != ''">#{durgConvert},</if>
+                <if test="durgStatus != null and durgStatus != ''">#{durgStatus},</if>
+                <if test="remark != null and remark != ''">#{remark},</if>
+                <if test="createBy != null and createBy !=''">#{createBy}, </if>
+                sysdate()
+        )
+    </insert>
+
+    <!-- 表连接查询，查询药品和对应的生产厂家 -->
+    <select id="selectList" resultMap="drugProMap">
+        select durg.durg_id, durg.durg_name, durg.durg_code, durg.durg_producer, durg.durg_type,
+               durg.durg_otc_type, durg.durg_unit, durg.durg_otc_price,
+               durg_number, durg.durg_number_min, durg.durg_convert, durg.durg_status, durg.create_by,
+               durg.create_time, durg.update_by, durg.update_time, durg.remark,
+               pro.pro_id, pro.pro_name, pro.pro_code, pro.pro_boss, pro.pro_phone, pro.pro_keywords,
+               pro.pro_status, pro.pro_address,
+               pro.create_by as p_create_by, pro.create_time as p_create_time, pro.update_by as p_update_by,
+               pro.update_time as p_update_time, pro.remark p_remark
+        from drugs_durg durg
+             left join
+             drugs_producer pro
+             on durg.durg_producer = pro.pro_id
+        <where>
+            <if test="durgName != null and durgName != ''"> and durg_name like concat('%', #{durgName}, '%') </if>
+            <if test="durgCode != null and durgCode != ''"> and durg_code = #{durgCode} </if>
+            <if test="durgType != null and durgType != ''"> and durg_type like concat('%', #{durgType}, '%') </if>
+            <if test="durgOtcType != null and durgOtcType != ''"> and durg_otc_type like concat('%', #{durgOtcType}, '%') </if>
+            <if test="durgStatus != null and durgStatus != ''"> and durg_status = #{durgStatus} </if>
+        </where>
+    </select>
+
+    <!-- 单表查询全部药品 -->
+    <select id="selectAll" resultMap="drugMap">
+        <include refid="selectDrugVo"></include>
+        <where>
+            <if test="durgName != null and durgName != ''"> and durg_name like concat('%', #{durgName}, '%') </if>
+            <if test="durgCode != null and durgCode != ''"> and durg_code = #{durgCode} </if>
+            <if test="durgType != null and durgType != ''"> and durg_type like concat('%', #{durgType}, '%') </if>
+            <if test="durgOtcType != null and durgOtcType != ''"> and durg_otc_type like concat('%', #{durgOtcType}, '%') </if>
+            <if test="durgStatus != null and durgStatus != ''"> and durg_status = #{durgStatus} </if>
+        </where>
+    </select>
+
+</mapper>

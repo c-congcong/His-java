@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ruoyi.project.drug.mapper.DrugProducerMapper">
+
+    <resultMap id="drugProMap" type="DrugProducer">
+        <id property="proId"             column="pro_id"/>
+        <result property="proName"       column="pro_name" />
+        <result property="proCode"       column="pro_code" />
+        <result property="proBoss"       column="pro_boss" />
+        <result property="proPhone"      column="pro_phone" />
+        <result property="proKeywords"   column="pro_keywords" />
+        <result property="proStatus"     column="pro_status" />
+        <result property="proAddress"    column="pro_address" />
+        <result property="createBy"      column="create_by"     />
+        <result property="createTime"    column="create_time"   />
+        <result property="updateBy"      column="update_by"     />
+        <result property="updateTime"    column="update_time"   />
+        <result property="remark"        column="remark"        />
+    </resultMap>
+
+    <sql id="selectDrugProducerVo">
+        select pro_id, pro_name, pro_code, pro_boss, pro_phone, pro_keywords, pro_status, pro_address,
+               create_by , create_time , update_by,update_time , remark
+        from drugs_producer
+    </sql>
+
+    <select id="selectAll" resultMap="drugProMap">
+        <include refid="selectDrugProducerVo"></include>
+    </select>
+
+</mapper>

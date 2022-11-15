@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ruoyi.project.drug.mapper.DrugsOrderAndOthersMapper">
+
+    <resultMap id="orderAndOthersMap" type="DrugsOrderAndOthers">
+        <result column="order_id"           property="orderId" />
+        <result column="order_man"          property="orderMan" />
+        <result column="create_time"        property="createTime" />
+        <result column="support_id"         property="supportId" />
+        <result column="support_name"       property="supportName" />
+        <result column="durg_id"            property="durgId" />
+        <result column="durg_name"          property="durgName" />
+        <result column="detail_id"          property="detailId" />
+        <result column="detail_bath_num"    property="detailBathNum" />
+        <result column="detail_total_price" property="detailTotalPrice" />
+        <result column="detail_status"      property="detailStatus" />
+        <result column="detail_operator"    property="detailOperator" />
+        <result column="detail_date"        property="detailDate" />
+        <result column="detail_remarks"     property="detailRemarks" />
+    </resultMap>
+
+    <select id="selectList" resultMap="orderAndOthersMap">
+        select
+          dorder.order_id, dorder.order_man, dorder.create_time,
+          support.support_id, support.support_name,
+          drug.durg_id, drug.durg_name,
+          detail.detail_id, detail.detail_bath_num, detail.detail_total_price,
+          detail.detail_status, detail.detail_operator, detail.detail_date, detail.detail_remarks
+        from
+          drugs_order_detail detail
+              left join
+          drugs_order dorder
+              on detail.order_id = dorder.order_id
+              left join
+          drugs_durg drug
+              on detail.detail_drugid = drug.durg_id
+              left join
+          drugs_support support
+              on dorder.order_sup_id = support.support_id
+        <where>
+            <if test="supportName != null and supportName != ''">
+                and support.support_name like concat('%', #{supportName}, '%')
+            </if>
+            <if test="orderMan != null and orderMan != ''">
+                and dorder.order_man like concat('%', #{orderMan}, '%')
+            </if>
+            <if test="detailStatus != null and detailStatus >= 0">
+                and detail.detail_status = #{detailStatus}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertDrugOrder" keyProperty="orderId" useGeneratedKeys="true">
+        insert into drugs_order(
+            <if test="orderId != null and orderId != 0">order_id,</if>
+            <if test="orderSupId != null and orderSupId != 0">order_sup_id,</if>
+            <if test="orderTotal != null and orderTotal != 0.0">order_total,</if>
+            <if test="orderMan != null and orderMan != ''">order_man,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        )
+        values(
+            <if test="orderId != null and orderId != 0">#{orderId},</if>
+            <if test="orderSupId != null and orderSupId != 0">#{orderSupId},</if>
+            <if test="orderTotal != null and orderTotal != 0.0">#{orderTotal},</if>
+            <if test="orderMan != null and orderMan != ''">#{orderMan},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        )
+    </insert>
+
+    <update id="updateDrugOrderDetail">
+        update drugs_order_detail
+        <set>
+            <if test="detailOperator != null and detailOperator != ''">detail_operator = #{detailOperator},</if>
+            <if test="detailDate != null">detail_date = #{detailDate},</if>
+            <if test="detailStatus != null">detail_status = #{detailStatus},</if>
+            <if test="detailDrugid != null and detailDrugid != 0">detail_drugid = #{detailDrugid},</if>
+            <if test="orderId != null and orderId != 0">order_id = #{orderId},</if>
+            <if test="detailDrugNum != null and detailDrugNum != 0.0">detail_drug_num = #{detailDrugNum},</if>
+            <if test="detailDrugPrice != null and detailDrugPrice != 0.0">detail_drug_price = #{detailDrugPrice},</if>
+            <if test="detailBathNum != null and detailBathNum != 0">detail_bath_num = #{detailBathNum},</if>
+            <if test="detailTotalPrice != null and detailTotalPrice != 0.0">detail_total_price = #{detailTotalPrice},</if>
+            <if test="detailRemarks != null and detailRemarks != ''">detail_remarks = #{detailRemarks},</if>
+            <if test="detailNorms != null and detailNorms != ''">detail_norms = #{detailNorms},</if>
+        </set>
+        where detail_id = #{detailId}
+    </update>
+
+    <insert id="insertDrugOrderDetail" keyProperty="detailId" useGeneratedKeys="true">
+        insert into drugs_order_detail(
+        <trim suffixOverrides=",">
+            <if test="detailId != null and detailId != 0">detail_id,</if>
+            <if test="detailOperator != null and detailOperator != ''">detail_operator,</if>
+            <if test="detailDate != null">detail_date,</if>
+            <if test="detailStatus != null">detail_status,</if>
+            <if test="detailDrugid != null and detailDrugid != 0">detail_drugid,</if>
+            <if test="orderId != null and orderId != 0">order_id,</if>
+            <if test="detailDrugNum != null and detailDrugNum != 0.0">detail_drug_num,</if>
+            <if test="detailDrugPrice != null and detailDrugPrice != 0.0">detail_drug_price,</if>
+            <if test="detailBathNum != null and detailBathNum != 0">detail_bath_num,</if>
+            <if test="detailTotalPrice != null and detailTotalPrice != 0.0">detail_total_price,</if>
+            <if test="detailRemarks != null and detailRemarks != ''">detail_remarks,</if>
+            <if test="detailNorms != null and detailNorms != ''">detail_norms,</if>
+        </trim>
+        )
+        values(
+        <trim suffixOverrides=",">
+            <if test="detailId != null and detailId != 0">#{detailId},</if>
+            <if test="detailOperator != null and detailOperator != ''">#{detailOperator},</if>
+            <if test="detailDate != null">#{detailDate},</if>
+            <if test="detailStatus != null">#{detailStatus},</if>
+            <if test="detailDrugid != null and detailDrugid != 0">#{detailDrugid},</if>
+            <if test="orderId != null and orderId != 0">#{orderId},</if>
+            <if test="detailDrugNum != null and detailDrugNum != 0.0">#{detailDrugNum},</if>
+            <if test="detailDrugPrice != null and detailDrugPrice != 0.0">#{detailDrugPrice},</if>
+            <if test="detailBathNum != null and detailBathNum != 0">#{detailBathNum},</if>
+            <if test="detailTotalPrice != null and detailTotalPrice != 0.0">#{detailTotalPrice},</if>
+            <if test="detailRemarks != null and detailRemarks != ''">#{detailRemarks},</if>
+            <if test="detailNorms != null and detailNorms != ''">#{detailNorms},</if>
+        </trim>
+        )
+    </insert>
+
+</mapper>
